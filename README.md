@@ -1,53 +1,59 @@
-Bayesian Optimisation Toolkit
+# Bayesian Optimisation Toolkit
 
-This package provides a framework for performing Bayesian optimisation on experimental data, featuring Latin Hypercube Sampling for initialisation and robust data persistence for manual experimental inputs.
+A robust Python-based framework for experimental design and Bayesian optimisation, featuring Latin Hypercube Sampling (LHS) and automated data persistence.
 
-File Overview
+[![Python Version](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-File
+---
 
-Description
+## 🛠 Project Structure
 
-latin
+The package consists of five core components designed to facilitate a seamless transition from initial sampling to iterative optimisation.
 
-Utilises Latin Hypercube Sampling (LHS) to generate initial design points. Running this script creates initial_data.xlsx.
+### 1. `latin.py` (LHS Initialisation)
+This module utilises **Latin Hypercube Sampling** to generate an optimal distribution of initial data points. 
+* **Output:** Generates `initial_data.xlsx`.
+* **Workflow:** Each row represents a specific combination of design variables. Users should perform the initial experiments and record the results directly into this spreadsheet before proceeding to the main optimisation loop.
 
-test
+### 2. `main.py` (Optimisation Engine)
+The core driver of the toolkit. It performs Bayesian optimisation based on the data provided in `initial_data.xlsx`.
+* **Objective:** By default, the engine seeks to **minimise** the objective function.
+* **Termination:** The process is governed by the `MaxObj` parameter, which defines the maximum number of allowable experimental trials.
+* **Monitoring:** During each iteration, the script outputs critical metrics, including the current objective value, the expected objective value, and the historical best result.
 
-A diagnostic script that simulates a high-speed experimental environment. It visualises the process via a line graph and displays the final results.
+### 3. `objective.py` (Data Management & Persistence)
+A dedicated interface for manual experimental data entry.
+* **Resilience:** Designed to ensure data integrity; if an experiment is terminated prematurely, all previously entered data is retained.
+* **Integration:** Automatically updates `initial_data.xlsx` with new experimental outcomes.
 
-test_function
+### 4. `test.py` (Visualisation & Validation)
+A demonstration script to verify system performance and visualise trends.
+* **Visuals:** Generates line graphs representing experimental progress and final results.
+* **Simulation:** Assumes high-velocity execution to demonstrate how progress scales over time.
 
-A basic objective function used for internal testing and validation of the optimisation logic.
+### 5. `test_function.py` (Benchmarking)
+Contains a standard test function used to validate the optimisation logic before applying it to real-world experimental data.
 
-main
+---
 
-The core optimisation engine. It performs Bayesian optimisation (minimisation by default) based on the data in initial_data.xlsx. The process terminates once the MaxObj (maximum experiment limit) is reached.
+## 🚀 Getting Started
 
-objective
+1. **Initialise Sampling:**
+   Run `python latin.py` to generate your design variable matrix in `initial_data.xlsx`.
+   
+2. **Conduct Experiments:**
+   Perform the physical or simulated experiments listed in the spreadsheet and fill in the results.
 
-An interface for manual data entry. It allows users to input experimental results and save them to initial_data.xlsx. It ensures data integrity even in the event of premature termination.
+3. **Execute Optimisation:**
+   Run `python main.py` to begin the Bayesian iteration. The system will suggest new points to sample.
 
-Workflow
+4. **Manual Entry:**
+   Use `objective.py` to input results for the newly suggested points. The data will be saved automatically, ensuring no progress is lost.
 
-Initialisation: Execute latin to generate the initial set of design variable combinations in initial_data.xlsx.
+---
 
-Experimental Data: Perform the experiments as defined in the spreadsheet. Populated results can be entered manually via the objective script.
-
-Optimisation: Run main to start the Bayesian optimisation loop. During each iteration, the program will output:
-
-Current objective function value.
-
-Expected objective value (via the acquisition function).
-
-Historical best value (current global minimum).
-
-Monitoring: Use the test script to verify the progress and performance of the optimisation through visual charts.
-
-Implementation Details
-
-Minimisation: The toolkit is configured to find the minimum value of the objective function by default.
-
-Data Persistence: The objective script is designed to save data incrementally. If an experimental session is interrupted, previously entered data remains secured in the Excel file.
-
-Termination Logic: The optimisation currently relies on a fixed budget defined by the MaxObj parameter.
+## 📊 Key Features
+* **Data Persistence:** Continuous saving to Excel prevents data loss during manual entry or system crashes.
+* **Smart Sampling:** Uses LHS to ensure the design space is explored efficiently from the outset.
+* **Iterative Insight:** Real-time feedback on expected vs. actual values to monitor convergence.
