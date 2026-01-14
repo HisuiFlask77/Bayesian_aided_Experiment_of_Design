@@ -1,97 +1,53 @@
-This package contains five files.
+Bayesian Optimisation Toolkit
 
+This package provides a framework for performing Bayesian optimisation on experimental data, featuring Latin Hypercube Sampling for initialisation and robust data persistence for manual experimental inputs.
 
+File Overview
 
-Latin:
+File
 
-Using Latin hypercube sampling to obtain initial data points, running will generate initial_data.xlsx.
+Description
 
-Each row represents a set of design variable combinations, conducting experiments, filling in the data in the table, and running main.
+latin
 
+Utilises Latin Hypercube Sampling (LHS) to generate initial design points. Running this script creates initial_data.xlsx.
 
+test
 
-test:
+A diagnostic script that simulates a high-speed experimental environment. It visualises the process via a line graph and displays the final results.
 
-A simple test program. Running will display the experimental progress chart and the experimental results.
+test_function
 
-Assuming the experiment speed is extremely fast, the experimental progress should be shown as a line graph.
+A basic objective function used for internal testing and validation of the optimisation logic.
 
-test_function:
+main
 
-A simple test function.
+The core optimisation engine. It performs Bayesian optimisation (minimisation by default) based on the data in initial_data.xlsx. The process terminates once the MaxObj (maximum experiment limit) is reached.
 
+objective
 
+An interface for manual data entry. It allows users to input experimental results and save them to initial_data.xlsx. It ensures data integrity even in the event of premature termination.
 
-main:
+Workflow
 
-Carrying out Bayesian optimization based on the data from initial_data.xlsx, aiming to minimize the objective function by default.
+Initialisation: Execute latin to generate the initial set of design variable combinations in initial_data.xlsx.
 
-Currently, the program can only be stopped based on the MaxObj parameter (maximum total number of experiments).
+Experimental Data: Perform the experiments as defined in the spreadsheet. Populated results can be entered manually via the objective script.
 
-During each iteration, information such as the objective function value, expected objective function value, and historical best value will be output.
+Optimisation: Run main to start the Bayesian optimisation loop. During each iteration, the program will output:
 
+Current objective function value.
 
+Expected objective value (via the acquisition function).
 
-objective:
+Historical best value (current global minimum).
 
-A function that requires manual input of experimental results.
+Monitoring: Use the test script to verify the progress and performance of the optimisation through visual charts.
 
-New experimental data can be saved to initial_data.xlsx.
+Implementation Details
 
-Even if the experiment is abandoned halfway, data can still be retained.
+Minimisation: The toolkit is configured to find the minimum value of the objective function by default.
 
+Data Persistence: The objective script is designed to save data incrementally. If an experimental session is interrupted, previously entered data remains secured in the Excel file.
 
-
-
-
-
-
-
-
-
-
-
-
-本包共包含五个文件。
-
-
-
-latin：
-
-使用拉丁超立方抽样获取初始数据点，运行后会获得initial_data.xlsx。
-
-每行代表一组设计变量组合，进行实验，将数据补充至表格内，运行main。
-
-
-
-test ：
-
-简单的测试程序。运行后会显示实验进程图以及实验结果。
-
-假设实验速度极快，实验进程应如折线图所示。
-
-
-
-test_function：
-
-简单的测试函数。
-
-
-
-main：
-
-基于initial_data.xlsx的数据进行贝叶斯优化，默认求目标函数的最小值。
-
-目前只能根据MaxObj这一参数(最大总实验次数) 停止程序。
-
-每次迭代时会输出目标函数值、预期目标函数值、历史最佳值等信息。
-
-
-
-objective：
-
-需手动输入实验结果的函数。
-
-可将新实验数据保存至initial_data.xlsx。
-
-即便实验半途而废，也能留下数据。
+Termination Logic: The optimisation currently relies on a fixed budget defined by the MaxObj parameter.
