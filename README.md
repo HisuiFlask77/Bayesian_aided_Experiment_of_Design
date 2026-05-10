@@ -1,4 +1,4 @@
-# Constrained Bayesian Optimization for 5D Process Discovery
+# Constrained Bayesian Optimization for Process Discovery and Optimization
 
 [![MATLAB](https://img.shields.io/badge/MATLAB-R2021a%2B-orange.svg)](https://www.mathworks.com/products/matlab.html)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
