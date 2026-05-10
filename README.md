@@ -1,59 +1,90 @@
-# Bayesian Optimisation Toolkit
+# Constrained Bayesian Optimization for 5D Process Discovery
 
-A robust Python-based framework for experimental design and Bayesian optimisation, featuring Latin Hypercube Sampling (LHS) and automated data persistence.
+[![MATLAB](https://img.shields.io/badge/MATLAB-R2021a%2B-orange.svg)](https://www.mathworks.com/products/matlab.html)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-[![Python Version](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-
----
-
-## 🛠 Project Structure
-
-The package consists of five core components designed to facilitate a seamless transition from initial sampling to iterative optimisation.
-
-### 1. `latin.py` (LHS Initialisation)
-This module utilises **Latin Hypercube Sampling** to generate an optimal distribution of initial data points. 
-* **Output:** Generates `initial_data.xlsx`.
-* **Workflow:** Each row represents a specific combination of design variables. Users should perform the initial experiments and record the results directly into this spreadsheet before proceeding to the main optimisation loop.
-
-### 2. `main.py` (Optimisation Engine)
-The core driver of the toolkit. It performs Bayesian optimisation based on the data provided in `initial_data.xlsx`.
-* **Objective:** By default, the engine seeks to **minimise** the objective function.
-* **Termination:** The process is governed by the `MaxObj` parameter, which defines the maximum number of allowable experimental trials.
-* **Monitoring:** During each iteration, the script outputs critical metrics, including the current objective value, the expected objective value, and the historical best result.
-
-### 3. `objective.py` (Data Management & Persistence)
-A dedicated interface for manual experimental data entry.
-* **Resilience:** Designed to ensure data integrity; if an experiment is terminated prematurely, all previously entered data is retained.
-* **Integration:** Automatically updates `initial_data.xlsx` with new experimental outcomes.
-
-### 4. `test.py` (Visualisation & Validation)
-A demonstration script to verify system performance and visualise trends.
-* **Visuals:** Generates line graphs representing experimental progress and final results.
-* **Simulation:** Assumes high-velocity execution to demonstrate how progress scales over time.
-
-### 5. `test_function.py` (Benchmarking)
-Contains a standard test function used to validate the optimisation logic before applying it to real-world experimental data.
+This repository provides a framework for **Constrained Bayesian Optimization (CBO)** applied to 5-dimensional chemical or physical systems. It is designed to maximize a specific output (Yield) while adhering to strict safety or quality thresholds (Purity $\ge 98\%$).
 
 ---
 
-## 🚀 Getting Started
+## 📌 Project Overview
 
-1. **Initialise Sampling:**
-   Run `python latin.py` to generate your design variable matrix in `initial_data.xlsx`.
-   
-2. **Conduct Experiments:**
-   Perform the physical or simulated experiments listed in the spreadsheet and fill in the results.
+Optimizing complex processes often involves balancing multiple parameters where experiments are costly or time-consuming. This tool uses Gaussian Process (GP) surrogate models to predict system behavior and Acquisition Functions to suggest the most promising next experiments.
 
-3. **Execute Optimisation:**
-   Run `python main.py` to begin the Bayesian iteration. The system will suggest new points to sample.
-
-4. **Manual Entry:**
-   Use `objective.py` to input results for the newly suggested points. The data will be saved automatically, ensuring no progress is lost.
+### Mathematical Formulation
+* **Objective:** Maximize $Yield$ (implemented as minimizing $-Yield$).
+* **Constraints:** $Purity \ge 98\%$ (implemented as $98 - Purity \le 0$).
+* **Search Space:** 5 continuous parameters (`para1` to `para5`) with defined physical bounds.
 
 ---
 
-## 📊 Key Features
-* **Data Persistence:** Continuous saving to Excel prevents data loss during manual entry or system crashes.
-* **Smart Sampling:** Uses LHS to ensure the design space is explored efficiently from the outset.
-* **Iterative Insight:** Real-time feedback on expected vs. actual values to monitor convergence.
+## 🚀 Optimization Strategies
+
+You can choose from three distinct acquisition strategies based on your optimization goals:
+
+| Strategy | Script | Description |
+| :--- | :--- | :--- |
+| **cEI** | `bo_cEI.m` | **Constrained Expected Improvement**: Balances exploration of unknown areas and exploitation of known good areas. |
+| **cPI** | `bo_cPI.m` | **Constrained Probability of Improvement**: Focuses on finding points with the highest probability of surpassing the current best result. |
+| **HDM** | `bo_HDM.m` | **Hybrid Decision Model**: A two-phase approach. It uses **cEI** for the first 75% of iterations for global search and switches to **cPI** for the final 25% for fine-tuning. |
+
+---
+
+## 🛠 Workflow & Usage
+
+The project follows a "Human-in-the-loop" or "Experimental-Feedback" workflow.
+
+### Step 1: Initialization
+Run `initialization.m`. 
+* This script uses **Latin Hypercube Sampling (LHS)** to generate 20 initial points.
+* It creates a file named `Initial_data.xlsx`.
+* **Sheet 1:** Contains the 5D input parameters for your initial experiments.
+* **Sheet 2:** Contains placeholder virtual data.
+
+### Step 2: Experimental Feedback
+1.  Perform the experiments suggested in `Initial_data.xlsx` (Sheet 1).
+2.  Open `Initial_data.xlsx` and go to **Sheet 2**.
+3.  Replace the placeholder values with your **measured Yield** and **measured Purity** for each corresponding row.
+
+### Step 3: Bayesian Optimization
+Choose an optimization script (e.g., `bo_HDM.m`) and run it.
+* The script will load your initial data from `Initial_data.xlsx`.
+* During the loop, MATLAB will suggest new parameters in the command window.
+* You will be prompted to enter the results:
+    ```text
+    Enter Measured Yield: 
+    Enter Measured Purity: 
+    ```
+* **Real-time Persistence:** After every iteration, the results are automatically saved to an Excel file (e.g., `bo_HDM.xlsx`) to prevent data loss.
+
+---
+
+## 📂 File Structure
+
+* `initialization.m`: Initial sampling and template generation.
+* `bo_cEI.m`: Main loop using the Expected Improvement strategy.
+* `bo_cPI.m`: Main loop using the Probability of Improvement strategy.
+* `bo_HDM.m`: Main loop using the Hybrid (cEI + cPI) strategy.
+* `Initial_data.xlsx`: Data bridge between sampling and optimization.
+
+---
+
+## 📊 Visualization
+
+The scripts include built-in visualization tools to track:
+1.  **Objective Value:** Progression of the best found Yield.
+2.  **Constraint Feasibility:** Evaluation of the Purity threshold model.
+3.  **Parameter Importance:** Insights into which parameters drive system performance.
+
+---
+
+## 💻 Requirements
+
+* **MATLAB R2021a** or newer.
+* **Statistics and Machine Learning Toolbox**.
+
+---
+
+## License
+
+This project is licensed under the MIT License.
